@@ -1,0 +1,125 @@
+{
+  "mappings": {
+    "dynamic": false,
+    "properties": {
+      "internal": {
+        "properties": {
+          "fulltext": {
+            "type": "text"
+          },
+          "autocomplete": {
+            "type": "keyword"
+          }
+        }
+      },
+      "photo_id": {
+        "type": "keyword"
+      },
+      "latitude": {
+        "type": "double"
+      },
+      "longitude": {
+        "type": "double"
+      },
+      "timestamp": {
+        "type": "date",
+        "format": "epoch_second"
+      },
+      "unique_id": {
+        "type": "keyword"
+      },
+      "datetaken": {
+        "type": "keyword"
+      },
+      "point_geom": {
+        "type": "geo_point"
+      },
+      "owner": {
+        "type": "keyword"
+      },
+      "ownername": {
+        "type": "keyword",
+        "copy_to": [
+          "internal.fulltext",
+          "internal.autocomplete"
+        ]
+      },
+      "secret": {
+        "type": "keyword"
+      },
+      "server": {
+        "type": "keyword"
+      },
+      "farm": {
+        "type": "keyword"
+      },
+      "title": {
+        "type": "keyword",
+        "copy_to": [
+          "internal.fulltext",
+          "internal.autocomplete"
+        ]
+      },
+      "tags": {
+        "type": "keyword",
+        "copy_to": [
+          "internal.fulltext",
+          "internal.autocomplete"
+        ]
+      },
+      "accuracy": {
+        "type": "long"
+      },
+      "o_height": {
+        "type": "long"
+      },
+      "o_width": {
+        "type": "long"
+      },
+      "machine_tags": {
+        "type": "keyword",
+        "copy_to": [
+          "internal.fulltext",
+          "internal.autocomplete"
+        ]
+      },
+      "context": {
+        "type": "long"
+      },
+      "place_id": {
+        "type": "keyword"
+      },
+      "woeid": {
+        "type": "keyword"
+      },
+      "day_in_year": {
+        "type": "long"
+      },
+      "day_in_week": {
+        "type": "keyword",
+        "copy_to": [
+          "internal.fulltext",
+          "internal.autocomplete"
+        ]
+      },
+      "day_in_week_num": {
+        "type": "long"
+      },
+      "hour_in_day": {
+        "type": "long"
+      },
+      "month": {
+        "type": "long"
+      },
+      "year": {
+        "type": "long"
+      },
+      "thumbnail_url": {
+        "type": "keyword"
+      },
+      "image_url": {
+        "type": "keyword"
+      }
+    }
+  }
+}

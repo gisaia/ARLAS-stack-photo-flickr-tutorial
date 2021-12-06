@@ -1,0 +1,7 @@
+{
+    "index_name": "flickr_index",
+    "id_path": "photo_id",
+    "timestamp_path": "timestamp",
+    "centroid_path": "point_geom",
+    "geometry_path": "point_geom"
+}
