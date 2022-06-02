@@ -68,14 +68,14 @@ cd ARLAS-stack-flickr-tutorial
 - Download the flickr data
 
 ```shell
-curl -L -O "https://github.com/gisaia/ARLAS-stack-photo-flickr-tutorial/raw/main/data/flickr_data.csv"
+curl -o flickr_data.json -L "https://raw.githubusercontent.com/gisaia/ARLAS-stack-photo-flickr-tutorial/master/data/flickr_data.json"
 
 ```
 
-Check that `flickr_data.csv` file is downloaded
+Check that `flickr_data.json` file is downloaded
 
 ```shell
-ls -l flickr_data.csv
+ls -l flickr_data.json
 
 ```
 
@@ -101,14 +101,13 @@ __1. Starting ARLAS Exploration Stack__
 ./ARLAS-Exploration-stack-develop/start.sh
 
 ```
-./ARLAS-Exploration-stack-develop/start.sh
 
 __2. Indexing flickr data in Elasticsearch__
 
 - Create `flickr_index` index in Elasticsearch with `flickr.es_mapping.json` mapping file
 
 ```shell
-curl https://raw.githubusercontent.com/gisaia/ARLAS-stack-photo-flickr-tutorial/main/configs/flickr.es_mapping.json | \
+curl "https://raw.githubusercontent.com/gisaia/ARLAS-stack-photo-flickr-tutorial/master/configs/flickr.es_mapping.json" |
 curl -XPUT http://localhost:9200/flickr_index/?pretty \
     -d @- \
     -H 'Content-Type: application/json'
@@ -121,30 +120,27 @@ You can check that the index is successfuly created by running the following com
 curl -XGET http://localhost:9200/flickr_index/_mapping?pretty
 
 ```
-curl -XDELETE http://localhost:9200/flickr_index
 
-- Index data in `flickr_data.csv` in Elasticsearch.  For that, We need Logstash as a data processing pipeline that ingests data in Elasticsearch. So we will download it and untar it:
+- Index data that is in `flickr_data.json` in Elasticsearch. For that, we need Logstash as a data processing pipeline that ingests data in Elasticsearch. Logstash needs a configuration file (`flickr2es.logstash.conf`) that indicates how to transform data from the CSV file and to index it in Elasticsearch.
 
-```shell
-( wget https://artifacts.elastic.co/downloads/logstash/logstash-7.4.2.tar.gz; tar -xzf logstash-7.4.2.tar.gz )
-
-```
-
-- Logstash needs a configuration file (`flickr2es.logstash.conf`) that indicates how to transform data from the JSON file and index it in Elasticsearch.
 
 ```shell
-curl "https://raw.githubusercontent.com/gisaia/ARLAS-stack-flickr-tutorial/main/configs/flickr2es.logstash.conf" \
+curl "https://raw.githubusercontent.com/gisaia/ARLAS-stack-photo-flickr-tutorial/master/configs/flickr2es.logstash.conf" \
     -o flickr2es.logstash.conf
     
 ```
 
-- Now we can index the data:
+- Now we will use Logstash in order to apply the data model transformation and to index data in Elasticsearch given the `flickr2es.logstash.conf` configuration file with the docker image `docker.elastic.co/logstash/logstash` :
 
 ```shell
-cat flickr_data.json | \
-    ./logstash-7.4.2/bin/logstash \
-    -f flickr2es.logstash.conf
-    
+network=$(docker network ls --format "table {{.Name}}" | grep arlas)
+
+cat flickr_data.json | docker run -e XPACK_MONITORING_ENABLED=false \
+    --net ${network} \
+    --env ELASTICSEARCH=elasticsearch:9200  \
+    --env INDEXNAME=flickr_index --rm -i \
+    -v ${PWD}/flickr2es.logstash.conf:/usr/share/logstash/pipeline/logstash.conf docker.elastic.co/logstash/logstash:7.11.2
+
 ```
 
 - Check if __50 000__ photo locations are indexed:
@@ -164,7 +160,7 @@ The collection references an identifier, a timestamp, and geographical fields wh
 - Create a Flickr collection in ARLAS
 
 ```shell
-curl "https://raw.githubusercontent.com/gisaia/ARLAS-stack-flickr-tutorial/main/configs/flickr_collection.json" | \
+curl "https://raw.githubusercontent.com/gisaia/ARLAS-stack-photo-flickr-tutorial/master/configs/flickr_collection.json" | \
 curl -X PUT \
     --header 'Content-Type: application/json;charset=utf-8' \
     --header 'Accept: application/json' \
@@ -175,7 +171,7 @@ curl -X PUT \
 
 - Check that the collection is created using the ARLAS-server `collections/{collection}`
 
-```
+```shell
 curl -X GET "http://localhost:81/server/collections/flickr_collection?pretty=true"
 
 ```
